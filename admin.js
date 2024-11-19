@@ -11,11 +11,11 @@ jQuery(document).ready(function ($) {
 		}
 
 		$.ajax({
-			url: locationGenerator.ajax_url,
+			url: fsBulkPageGenerator.ajax_url,
 			type: 'POST',
 			data: {
 				action: 'get_template_placeholders',
-				nonce: locationGenerator.nonce,
+				nonce: fsBulkPageGenerator.nonce,
 				template_id: templateId,
 			},
 			success: function (response) {
@@ -148,11 +148,11 @@ jQuery(document).ready(function ($) {
 		});
 
 		$.ajax({
-			url: locationGenerator.ajax_url,
+			url: fsBulkPageGenerator.ajax_url,
 			type: 'POST',
 			data: {
 				action: 'preview_mapping',
-				nonce: locationGenerator.nonce,
+				nonce: fsBulkPageGenerator.nonce,
 				template_id: $('#template_page').val(),
 				mapping: mapping,
 				sample_data: csvData[0],
@@ -200,11 +200,11 @@ jQuery(document).ready(function ($) {
 			}
 
 			$.ajax({
-				url: locationGenerator.ajax_url,
+				url: fsBulkPageGenerator.ajax_url,
 				type: 'POST',
 				data: {
 					action: 'process_csv',
-					nonce: locationGenerator.nonce,
+					nonce: fsBulkPageGenerator.nonce,
 					template_id: $('#template_page').val(),
 					mapping: mapping,
 					csv_data: batch,
@@ -226,8 +226,34 @@ jQuery(document).ready(function ($) {
 						$('#progress_area').hide();
 					}
 				},
-				error: function () {
-					alert('Error processing batch');
+				error: function (xhr, status, error) {
+					console.error('AJAX Error:', {
+						status: status,
+						error: error,
+						response: xhr.responseText,
+						xhr: xhr,
+					});
+
+					// Log the data that was being sent
+					console.log('Data being sent:', {
+						action: 'process_csv',
+						nonce: fsBulkPageGenerator.nonce,
+						template_id: $('#template_page').val(),
+						mapping: mapping,
+						csv_data: batch,
+						slug_settings: slugSettings,
+					});
+
+					let errorMessage = 'Error processing batch: ';
+					if (xhr.responseJSON && xhr.responseJSON.data) {
+						errorMessage += xhr.responseJSON.data;
+					} else if (xhr.responseText) {
+						errorMessage += xhr.responseText;
+					} else {
+						errorMessage += error;
+					}
+
+					alert(errorMessage);
 					$('#progress_area').hide();
 				},
 			});

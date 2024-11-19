@@ -1,4 +1,4 @@
-=== Bulk Page Generator ===
+=== FullScope Bulk Page Generator ===
 Contributors: derekjubach
 Author: FullScope
 Tags: pages, generator, csv, import, bulk pages, location pages
@@ -7,7 +7,7 @@ Tested up to: 6.7
 Stable tag: 1.0
 Requires PHP: 7.2
 License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
 Generate multiple WordPress pages from a CSV file using an existing page as a template.
 
