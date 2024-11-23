@@ -63,19 +63,7 @@ jQuery(document).ready(function ($) {
 		const container = $('#mapping_fields');
 		container.empty();
 
-		// Add title mapping field first
-		container.append(`
-            <div class="mapping-field" style="margin-bottom: 10px;">
-                <label style="display: inline-block; width: 200px;">
-                    Page Title:
-                </label>
-                <select class="column-mapper" data-placeholder="title">
-                    <option value="">Select CSV column...</option>
-                </select>
-            </div>
-        `);
-
-		// Add rest of placeholder mapping fields
+		// Add mapping fields for all placeholders
 		placeholders.forEach(placeholder => {
 			const fieldHtml = `
                 <div class="mapping-field" style="margin-bottom: 10px;">
