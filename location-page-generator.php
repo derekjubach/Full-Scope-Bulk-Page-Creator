@@ -108,14 +108,15 @@ class FSBulkPageGenerator
         <button class="button button-secondary" id="preview_mapping"><?php esc_html_e('Preview First Row', 'fs-bulk-page-generator'); ?></button>
         <div id="preview_content" style="margin-top: 20px;"></div>
         <button class="button button-primary" id="generate_pages" style="margin-top: 20px;"><?php esc_html_e('Generate All Pages', 'fs-bulk-page-generator'); ?></button>
-      </div>
-      <div id="progress_area" style="display: none; margin-top: 20px;">
-        <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
-        <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
-          <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+        <div id="progress_area" style="display: none; margin-top: 20px;">
+          <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
+          <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
+            <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+          </div>
+          <div id="progress_text"></div>
         </div>
-        <div id="progress_text"></div>
       </div>
+
     </div>
 <?php
   }
@@ -311,6 +312,16 @@ class FSBulkPageGenerator
 
           // Debug: Check the actual slug after insertion
           if (!is_wp_error($post_id)) {
+
+            // Add meta title
+            if (isset($row['meta_title']) && !empty($row['meta_title'])) {
+              update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($row['meta_title']));
+            }
+            // Add meta description
+            if (isset($row['meta_description']) && !empty($row['meta_description'])) {
+              update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_text_field($row['meta_description']));
+            }
+
             $created_post = get_post($post_id);
             error_log("Final slug after insertion: " . $created_post->post_name);
             if ($created_post->post_name !== $post_slug) {
