@@ -60,13 +60,6 @@ class FSBulkPageGenerator
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
 
       <div class="card">
-        <div id="progress_area" style="display: none; margin-top: 20px;">
-          <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
-          <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
-            <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
-          </div>
-          <div id="progress_text"></div>
-        </div>
         <h2><?php esc_html_e('Step 1: Select Template Page', 'fs-bulk-page-generator'); ?></h2>
         <p><?php esc_html_e('Choose an existing page to use as your template. The page should include placeholders in the format {{placeholder_name}}.', 'fs-bulk-page-generator'); ?></p>
         <select id="template_page" style="width: 300px;">
@@ -116,6 +109,13 @@ class FSBulkPageGenerator
         <div id="preview_content" style="margin-top: 20px;"></div>
         <button class="button button-primary" id="generate_pages" style="margin-top: 20px;"><?php esc_html_e('Generate All Pages', 'fs-bulk-page-generator'); ?></button>
       </div>
+      <div id="progress_area" style="display: none; margin-top: 20px;">
+        <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
+        <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
+          <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+        </div>
+        <div id="progress_text"></div>
+      </div>
     </div>
 <?php
   }
@@ -135,8 +135,9 @@ class FSBulkPageGenerator
     // Get both the raw content and rendered content
     $raw_content = $template_page->post_content;
     $rendered_content = apply_filters('the_content', $raw_content);
+    $title_content = $template_page->post_title; // Add title content
 
-    // Search for placeholders in both raw and rendered content
+    // Search for placeholders in content and title
     $placeholders = array();
 
     // Search raw content
@@ -151,6 +152,12 @@ class FSBulkPageGenerator
       $placeholders = array_merge($placeholders, $rendered_matches[1]);
     }
 
+    // Search title
+    preg_match_all($this->placeholder_pattern, $title_content, $title_matches);
+    if (!empty($title_matches[1])) {
+      $placeholders = array_merge($placeholders, $title_matches[1]);
+    }
+
     // Remove duplicates and clean up
     $placeholders = array_unique($placeholders);
     $placeholders = array_values(array_filter($placeholders));
@@ -161,6 +168,7 @@ class FSBulkPageGenerator
       'debug' => array(
         'raw_content_length' => strlen($raw_content),
         'rendered_content_length' => strlen($rendered_content),
+        'title_content' => $title_content,
         'placeholder_count' => count($placeholders)
       )
     );
@@ -263,7 +271,17 @@ class FSBulkPageGenerator
           }
 
           // Make sure we have a title
-          $post_title = isset($row[$mapping['title']]) ? sanitize_text_field($row[$mapping['title']]) : 'New Location';
+          $post_title = $template_page->post_title; // Get the template's title as base
+          // Replace any placeholders in the title
+          foreach ($mapping as $placeholder => $column) {
+            if (isset($row[$column])) {
+              $post_title = str_replace(
+                '{{' . $placeholder . '}}',
+                sanitize_text_field($row[$column]),
+                $post_title
+              );
+            }
+          }
 
           // Generate the initial slug
           $post_slug = isset($row[$slug_settings['column']]) ?
