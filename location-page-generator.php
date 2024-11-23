@@ -265,10 +265,17 @@ class FSBulkPageGenerator
           // Make sure we have a title
           $post_title = isset($row[$mapping['title']]) ? sanitize_text_field($row[$mapping['title']]) : 'New Location';
 
-          // Make sure we have a valid slug
+          // Generate the initial slug
           $post_slug = isset($row[$slug_settings['column']]) ?
             sanitize_title($row[$slug_settings['column']]) :
             sanitize_title($post_title);
+
+          // Debug logging
+          error_log("Original slug before insertion: " . $post_slug);
+
+          // Check if a post with this slug exists (even though we're on a clean install)
+          $existing_post = get_page_by_path($post_slug, OBJECT, 'page');
+          error_log("Existing post check result: " . ($existing_post ? "Found with ID: {$existing_post->ID}" : "Not found"));
 
           $post_data = array(
             'post_title'   => $post_title,
@@ -284,20 +291,18 @@ class FSBulkPageGenerator
 
           $post_id = wp_insert_post($post_data, true);
 
+          // Debug: Check the actual slug after insertion
           if (!is_wp_error($post_id)) {
-            // Add meta title
-            if (isset($row['meta_title']) && !empty($row['meta_title'])) {
-              update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($row['meta_title']));
-            }
-            // Add meta description
-            if (isset($row['meta_description']) && !empty($row['meta_description'])) {
-              update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_text_field($row['meta_description']));
+            $created_post = get_post($post_id);
+            error_log("Final slug after insertion: " . $created_post->post_name);
+            if ($created_post->post_name !== $post_slug) {
+              error_log("Slug was modified by WordPress from '{$post_slug}' to '{$created_post->post_name}'");
             }
             $results['success']++;
           } else {
+            error_log("Error creating post: " . $post_id->get_error_message());
             $results['failed']++;
             $results['errors'][] = $post_id->get_error_message();
-            error_log('Failed to insert post: ' . $post_id->get_error_message());
           }
         } catch (Exception $e) {
           error_log('Exception processing row: ' . $e->getMessage());
