@@ -22,6 +22,15 @@ jQuery(document).ready(function ($) {
 				if (response.success) {
 					$('#mapping_section').show();
 					createMappingFields(response.data.placeholders);
+
+					// Log debug information
+					console.log('Template scanning debug info:', response.data.debug);
+
+					if (response.data.placeholders.length === 0) {
+						alert(
+							'No placeholders found in the template. Please ensure your placeholders are in the format {{placeholder_name}}'
+						);
+					}
 				} else {
 					alert('Error: ' + response.data);
 				}

@@ -60,6 +60,13 @@ class FSBulkPageGenerator
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
 
       <div class="card">
+        <div id="progress_area" style="display: none; margin-top: 20px;">
+          <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
+          <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
+            <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+          </div>
+          <div id="progress_text"></div>
+        </div>
         <h2><?php esc_html_e('Step 1: Select Template Page', 'fs-bulk-page-generator'); ?></h2>
         <p><?php esc_html_e('Choose an existing page to use as your template. The page should include placeholders in the format {{placeholder_name}}.', 'fs-bulk-page-generator'); ?></p>
         <select id="template_page" style="width: 300px;">
@@ -109,14 +116,6 @@ class FSBulkPageGenerator
         <div id="preview_content" style="margin-top: 20px;"></div>
         <button class="button button-primary" id="generate_pages" style="margin-top: 20px;"><?php esc_html_e('Generate All Pages', 'fs-bulk-page-generator'); ?></button>
       </div>
-
-      <div id="progress_area" style="display: none; margin-top: 20px;">
-        <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
-        <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
-          <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
-        </div>
-        <div id="progress_text"></div>
-      </div>
     </div>
 <?php
   }
@@ -133,11 +132,40 @@ class FSBulkPageGenerator
       return;
     }
 
-    $content = $template_page->post_content;
-    preg_match_all($this->placeholder_pattern, $content, $matches);
+    // Get both the raw content and rendered content
+    $raw_content = $template_page->post_content;
+    $rendered_content = apply_filters('the_content', $raw_content);
 
-    $placeholders = array_unique($matches[1]);
-    wp_send_json_success(array('placeholders' => $placeholders));
+    // Search for placeholders in both raw and rendered content
+    $placeholders = array();
+
+    // Search raw content
+    preg_match_all($this->placeholder_pattern, $raw_content, $raw_matches);
+    if (!empty($raw_matches[1])) {
+      $placeholders = array_merge($placeholders, $raw_matches[1]);
+    }
+
+    // Search rendered content
+    preg_match_all($this->placeholder_pattern, $rendered_content, $rendered_matches);
+    if (!empty($rendered_matches[1])) {
+      $placeholders = array_merge($placeholders, $rendered_matches[1]);
+    }
+
+    // Remove duplicates and clean up
+    $placeholders = array_unique($placeholders);
+    $placeholders = array_values(array_filter($placeholders));
+
+    // Add debugging information
+    $debug_info = array(
+      'placeholders' => $placeholders,
+      'debug' => array(
+        'raw_content_length' => strlen($raw_content),
+        'rendered_content_length' => strlen($rendered_content),
+        'placeholder_count' => count($placeholders)
+      )
+    );
+
+    wp_send_json_success($debug_info);
   }
 
   public function preview_mapping()
@@ -221,11 +249,14 @@ class FSBulkPageGenerator
       foreach ($csv_data as $row) {
         try {
           $content = $template_page->post_content;
+          $rendered_content = apply_filters('the_content', $content);
+
           foreach ($mapping as $placeholder => $column) {
             if (isset($row[$column])) {
+              $replacement = wp_kses_post($row[$column]);
               $content = str_replace(
                 '{{' . $placeholder . '}}',
-                wp_kses_post($row[$column]),
+                $replacement,
                 $content
               );
             }
@@ -254,6 +285,11 @@ class FSBulkPageGenerator
           $post_id = wp_insert_post($post_data, true);
 
           if (!is_wp_error($post_id)) {
+            // Add meta title
+            if (isset($row['meta_title']) && !empty($row['meta_title'])) {
+              update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($row['meta_title']));
+            }
+            // Add meta description
             if (isset($row['meta_description']) && !empty($row['meta_description'])) {
               update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_text_field($row['meta_description']));
             }
