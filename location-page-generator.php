@@ -299,7 +299,7 @@ class FSBulkPageGenerator
           $post_data = array(
             'post_title'   => $post_title,
             'post_content' => $content,
-            'post_status'  => 'publish',
+            'post_status'  => 'draft',
             'post_type'    => 'page',
             'post_name'    => $post_slug,
             'post_parent'  => isset($slug_settings['parent_id']) ? intval($slug_settings['parent_id']) : 0
