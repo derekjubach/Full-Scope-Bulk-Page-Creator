@@ -466,6 +466,10 @@ class FullScope_Bulk_Page_Generator
 
   public function process_csv()
   {
+    // Enable error reporting for debugging
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
     try {
       check_ajax_referer('fs_bulk_page_generator_nonce', 'nonce');
 
@@ -476,17 +480,21 @@ class FullScope_Bulk_Page_Generator
 
       // Add error checking for required parameters
       if (!isset($_POST['template_id']) || !isset($_POST['mapping']) || !isset($_POST['csv_data']) || !isset($_POST['slug_settings'])) {
-        $this->fs_bulk_page_generator_log('FS Bulk Page Generator: Missing required parameters');
-        wp_send_json_error('Missing required parameters');
+        wp_send_json_error('Missing required parameters: ' . print_r($_POST, true));
         return;
       }
 
       $template_id = intval($_POST['template_id']);
 
       // Sanitize the arrays directly without trying to decode JSON
-      $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
-      $csv_data = isset($_POST['csv_data']) ? array_map('sanitize_text_field', wp_unslash($_POST['csv_data'])) : array();
-      $slug_settings = isset($_POST['slug_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['slug_settings'])) : array();
+      $mapping = isset($_POST['mapping']) ? wp_unslash($_POST['mapping']) : array();
+      $csv_data = isset($_POST['csv_data']) ? wp_unslash($_POST['csv_data']) : array();
+      $slug_settings = isset($_POST['slug_settings']) ? wp_unslash($_POST['slug_settings']) : array();
+
+      // Log the data
+      error_log('Mapping: ' . print_r($mapping, true));
+      error_log('CSV data: ' . print_r($csv_data, true));
+      error_log('Slug settings: ' . print_r($slug_settings, true));
 
       // Validate data
       if (empty($mapping) || empty($csv_data) || empty($slug_settings)) {
@@ -540,12 +548,12 @@ class FullScope_Bulk_Page_Generator
             sanitize_title($row[$slug_settings['column']]) :
             sanitize_title($post_title);
 
-          // Check if a post with this slug exists
-          $existing_post = get_page_by_path($post_slug, OBJECT, 'page');
+          // Debug logging
+          error_log("Original slug before insertion: " . $post_slug);
 
-          if ($existing_post) {
-            $this->fs_bulk_page_generator_log('FS Bulk Page Generator: Post already exists with slug: ' . $post_slug);
-          }
+          // Check if a post with this slug exists (even though we're on a clean install)
+          $existing_post = get_page_by_path($post_slug, OBJECT, 'page');
+          error_log("Existing post check result: " . ($existing_post ? "Found with ID: {$existing_post->ID}" : "Not found"));
 
           $post_data = array(
             'post_title'   => $post_title,
@@ -555,6 +563,9 @@ class FullScope_Bulk_Page_Generator
             'post_name'    => $post_slug,
             'post_parent'  => isset($slug_settings['parent_id']) ? intval($slug_settings['parent_id']) : 0
           );
+
+          // Log the post data before insertion
+          error_log('Attempting to insert post with data: ' . print_r($post_data, true));
 
           $post_id = wp_insert_post($post_data, true);
 
@@ -580,19 +591,18 @@ class FullScope_Bulk_Page_Generator
             }
 
             $created_post = get_post($post_id);
+            error_log("Final slug after insertion: " . $created_post->post_name);
             if ($created_post->post_name !== $post_slug) {
-              $this->fs_bulk_page_generator_log('FS Bulk Page Generator: Slug was modified from "' . $post_slug . '" to "' . $created_post->post_name . '"');
+              error_log("Slug was modified by WordPress from '{$post_slug}' to '{$created_post->post_name}'");
             }
             $results['success']++;
           } else {
-
-            $this->fs_bulk_page_generator_log('FS Bulk Page Generator: Error creating post: ' . $post_id->get_error_message());
-
+            error_log("Error creating post: " . $post_id->get_error_message());
             $results['failed']++;
             $results['errors'][] = $post_id->get_error_message();
           }
         } catch (Exception $e) {
-          $this->fs_bulk_page_generator_log('Exception processing row: ' . $e->getMessage());
+          error_log('Exception processing row: ' . $e->getMessage());
           $results['failed']++;
           $results['errors'][] = $e->getMessage();
         }
@@ -600,7 +610,7 @@ class FullScope_Bulk_Page_Generator
 
       wp_send_json_success($results);
     } catch (Exception $e) {
-      $this->fs_bulk_page_generator_log('FS Bulk Page Generator: Major exception in process_csv: ' . $e->getMessage());
+      error_log('Major exception in process_csv: ' . $e->getMessage());
       wp_send_json_error('Processing error: ' . $e->getMessage());
     }
   }
