@@ -55,6 +55,44 @@ class FSBulkPageGenerator
       #preview_section img {
         max-width: 100%;
       }
+
+      .page-content-preview {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+      }
+
+      .page-content-preview h4 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .yoast-preview-section {
+        background: #f7f7f7;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      .yoast-preview-section h4 {
+        margin-top: 0;
+        color: #006d9c;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .yoast-meta-field {
+        margin: 10px 0;
+        padding: 5px;
+        background: #fff;
+        border: 1px solid #eee;
+      }
+
+      .yoast-meta-field strong {
+        color: #666;
+      }
     </style>
     <div class="wrap fs-bulk-page-generator">
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
@@ -213,6 +251,7 @@ class FSBulkPageGenerator
     $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
     $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
     $sample_data = isset($_POST['sample_data']) ? array_map('sanitize_text_field', wp_unslash($_POST['sample_data'])) : array();
+    $yoast_settings = isset($_POST['yoast_settings']) ? wp_unslash($_POST['yoast_settings']) : array();
 
     $template_page = get_post($template_id);
     if (!$template_page) {
@@ -231,7 +270,37 @@ class FSBulkPageGenerator
       }
     }
 
-    wp_send_json_success(array('preview' => $content));
+    // Prepare Yoast preview data
+    $yoast_preview = '';
+    if (
+      isset($yoast_settings['import_meta_title']) && $yoast_settings['import_meta_title'] === 'yes'
+      || isset($yoast_settings['import_meta_desc']) && $yoast_settings['import_meta_desc'] === 'yes'
+    ) {
+
+      $yoast_preview .= '<div class="yoast-preview-section">';
+      $yoast_preview .= '<h4>Yoast SEO Preview</h4>';
+
+      if ($yoast_settings['import_meta_title'] === 'yes' && isset($sample_data['meta_title'])) {
+        $yoast_preview .= '<div class="yoast-meta-field">';
+        $yoast_preview .= '<strong>Meta Title:</strong> ';
+        $yoast_preview .= esc_html($sample_data['meta_title']);
+        $yoast_preview .= '</div>';
+      }
+
+      if ($yoast_settings['import_meta_desc'] === 'yes' && isset($sample_data['meta_description'])) {
+        $yoast_preview .= '<div class="yoast-meta-field">';
+        $yoast_preview .= '<strong>Meta Description:</strong> ';
+        $yoast_preview .= esc_html($sample_data['meta_description']);
+        $yoast_preview .= '</div>';
+      }
+
+      $yoast_preview .= '</div>';
+    }
+
+    wp_send_json_success(array(
+      'preview' => $content,
+      'yoast_preview' => $yoast_preview
+    ));
   }
 
   public function process_csv()

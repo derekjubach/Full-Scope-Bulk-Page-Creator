@@ -153,10 +153,24 @@ jQuery(document).ready(function ($) {
 				template_id: $('#template_page').val(),
 				mapping: mapping,
 				sample_data: csvData[0],
+				yoast_settings: {
+					import_meta_title: $('input[name="import_meta_title"]:checked').val(),
+					import_meta_desc: $('input[name="import_meta_desc"]:checked').val(),
+				},
 			},
 			success: function (response) {
 				if (response.success) {
-					$('#preview_content').html(response.data.preview);
+					let previewHtml = '<div class="page-content-preview">';
+					previewHtml += '<h4>Page Content Preview</h4>';
+					previewHtml +=
+						'<div class="content-area">' + response.data.preview + '</div>';
+					previewHtml += '</div>';
+
+					if (response.data.yoast_preview) {
+						previewHtml += response.data.yoast_preview;
+					}
+
+					$('#preview_content').html(previewHtml);
 				} else {
 					alert('Error: ' + response.data);
 				}
