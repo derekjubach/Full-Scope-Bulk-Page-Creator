@@ -1,5 +1,5 @@
 === FullScope Bulk Page Generator ===
-Contributors: derekjubach
+Contributors: derekjubach, FullScope
 Author: FullScope
 Tags: pages, generator, csv, import, bulk pages, location pages
 Requires at least: 5.0
