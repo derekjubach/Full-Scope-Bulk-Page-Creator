@@ -61,6 +61,14 @@ Yes, you can select a parent page, and all generated pages will be created as ch
 = What happens if something goes wrong during generation? =
 The plugin processes pages in batches and provides detailed error reporting if any issues occur.
 
+= To enable error logging for troubleshooting, add these lines to your wp-config.php:
+
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG_DISPLAY', false ); // Prevents errors from displaying on screen
+
+Logs will be written to wp-content/debug.log
+
 == Screenshots ==
 
 1. Main interface showing template selection
