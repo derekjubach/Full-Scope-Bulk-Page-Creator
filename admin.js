@@ -206,6 +206,10 @@ jQuery(document).ready(function ($) {
 					mapping: mapping,
 					csv_data: batch,
 					slug_settings: slugSettings,
+					yoast_settings: {
+						import_meta_title: $('input[name="import_meta_title"]:checked').val(),
+						import_meta_desc: $('input[name="import_meta_desc"]:checked').val(),
+					},
 				},
 				success: function (response) {
 					processedRows += batch.length;
