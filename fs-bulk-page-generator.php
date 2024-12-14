@@ -412,7 +412,7 @@ class FullScope_Bulk_Page_Generator
     $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
     $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
     $sample_data = isset($_POST['sample_data']) ? array_map('sanitize_text_field', wp_unslash($_POST['sample_data'])) : array();
-    $yoast_settings = isset($_POST['yoast_settings']) ? wp_unslash($_POST['yoast_settings']) : array();
+    $yoast_settings = isset($_POST['yoast_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['yoast_settings'])) : array();
 
     $template_page = get_post($template_id);
     if (!$template_page) {
@@ -487,9 +487,9 @@ class FullScope_Bulk_Page_Generator
       $template_id = intval($_POST['template_id']);
 
       // Sanitize the arrays directly without trying to decode JSON
-      $mapping = isset($_POST['mapping']) ? wp_unslash($_POST['mapping']) : array();
-      $csv_data = isset($_POST['csv_data']) ? wp_unslash($_POST['csv_data']) : array();
-      $slug_settings = isset($_POST['slug_settings']) ? wp_unslash($_POST['slug_settings']) : array();
+      $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
+      $csv_data = isset($_POST['csv_data']) ? array_map('sanitize_text_field', wp_unslash($_POST['csv_data'])) : array();
+      $slug_settings = isset($_POST['slug_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['slug_settings'])) : array();
 
       // Log the data
       error_log('Mapping: ' . print_r($mapping, true));
@@ -633,10 +633,10 @@ class FullScope_Bulk_Page_Generator
       'ajax_url' => admin_url('admin-ajax.php'),
       'nonce' => wp_create_nonce('fs_bulk_page_generator_nonce'),
       'strings' => array(
-        'confirmGenerate' => __('Are you sure you want to generate pages for all CSV rows?', self::TEXT_DOMAIN),
-        'selectTemplate' => __('Please select a template page first', self::TEXT_DOMAIN),
-        'uploadCsv' => __('Please upload a CSV file first', self::TEXT_DOMAIN),
-        'complete' => __('All pages have been generated!', self::TEXT_DOMAIN),
+        'confirmGenerate' => __('Are you sure you want to generate pages for all CSV rows?', 'fs-bulk-page-generator'),
+        'selectTemplate' => __('Please select a template page first', 'fs-bulk-page-generator'),
+        'uploadCsv' => __('Please upload a CSV file first', 'fs-bulk-page-generator'),
+        'complete' => __('All pages have been generated!', 'fs-bulk-page-generator'),
       )
     ));
   }
