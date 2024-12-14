@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: FullScope Bulk Page Generator 
+ * Plugin Name: FullScope Bulk Page Generator
  * Description: Bulk Generate pages from a CSV file 
  * Version: 1.0
  * Author: Derek Jubach
@@ -56,7 +56,7 @@ class FSBulkPageGenerator
         max-width: 100%;
       }
     </style>
-    <div class="wrap">
+    <div class="wrap fs-bulk-page-generator">
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
 
       <div class="card">
@@ -82,43 +82,72 @@ class FSBulkPageGenerator
         </div>
 
         <div id="parent_page_section" style="margin-top: 20px;">
-          <h3><?php esc_html_e('Parent Page Settings', 'fs-bulk-page-generator'); ?></h3>
-          <p><?php esc_html_e('Select a parent page for all generated location pages:', 'fs-bulk-page-generator'); ?></p>
-          <select id="parent_page" style="width: 300px;">
-            <option value="0"><?php esc_html_e('No parent (top level)', 'fs-bulk-page-generator'); ?></option>
-            <?php
-            foreach ($pages as $page):
-            ?>
-              <option value="<?php echo esc_attr($page->ID); ?>">
-                <?php echo esc_html($page->post_title); ?>
-              </option>
-            <?php
-            endforeach;
-            ?>
-          </select>
-          <p><?php esc_html_e('URL slug will be taken from the following CSV column:', 'fs-bulk-page-generator'); ?></p>
-          <select id="slug_column">
-            <!-- Options will be populated from CSV headers -->
-          </select>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top: 20px; display: none" id="preview_section">
-        <h2><?php esc_html_e('Step 3: Preview and Generate', 'fs-bulk-page-generator'); ?></h2>
-        <button class="button button-secondary" id="preview_mapping"><?php esc_html_e('Preview First Row', 'fs-bulk-page-generator'); ?></button>
-        <div id="preview_content" style="margin-top: 20px;"></div>
-        <button class="button button-primary" id="generate_pages" style="margin-top: 20px;"><?php esc_html_e('Generate All Pages', 'fs-bulk-page-generator'); ?></button>
-        <div id="progress_area" style="display: none; margin-top: 20px;">
-          <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
-          <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
-            <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+          <div class="card">
+            <h4><?php esc_html_e('Parent Page Settings', 'fs-bulk-page-generator'); ?></h4>
+            <p><?php esc_html_e('Select a parent page for all generated location pages:', 'fs-bulk-page-generator'); ?></p>
+            <select id="parent_page" style="width: 300px;">
+              <option value="0"><?php esc_html_e('No parent (top level)', 'fs-bulk-page-generator'); ?></option>
+              <?php
+              foreach ($pages as $page):
+              ?>
+                <option value="<?php echo esc_attr($page->ID); ?>">
+                  <?php echo esc_html($page->post_title); ?>
+                </option>
+              <?php
+              endforeach;
+              ?>
+            </select>
+            <p><?php esc_html_e('URL slug will be taken from the following CSV column:', 'fs-bulk-page-generator'); ?></p>
+            <select id="slug_column">
+              <!-- Options will be populated from CSV headers -->
+            </select>
           </div>
-          <div id="progress_text"></div>
-        </div>
-      </div>
+          <div id="yoast_settings" class="card" style="margin-top: 20px;">
+            <h4><?php esc_html_e('Yoast SEO Settings', 'fs-bulk-page-generator'); ?></h4>
+            <p><?php esc_html_e('Import Meta Titles and Descriptions from CSV into Yoast SEO? You do not need placeholders for this.', 'fs-bulk-page-generator'); ?></p>
+            <p class="small"><?php esc_html_e('Be sure to have the Yoast SEO plugin installed and activated. Your CSV columns must have the following names:', 'fs-bulk-page-generator'); ?></p>
+            <ul>
+              <li>meta_title</li>
+              <li>meta_description</li>
+            </ul>
+            <div style="margin-bottom: 15px;">
+              <p><?php esc_html_e('Import Meta Titles from CSV?', 'fs-bulk-page-generator'); ?></p>
+              <label style="margin-right: 15px;">
+                <input type="radio" name="import_meta_title" value="yes"> Yes
+              </label>
+              <label>
+                <input type="radio" name="import_meta_title" value="no" checked> No
+              </label>
+            </div>
 
-    </div>
-<?php
+            <div>
+              <p><?php esc_html_e('Import Meta Descriptions from CSV?', 'fs-bulk-page-generator'); ?></p>
+              <label style="margin-right: 15px;">
+                <input type="radio" name="import_meta_desc" value="yes"> Yes
+              </label>
+              <label>
+                <input type="radio" name="import_meta_desc" value="no" checked> No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px; display: none" id="preview_section">
+          <h2><?php esc_html_e('Step 3: Preview and Generate', 'fs-bulk-page-generator'); ?></h2>
+          <button class="button button-secondary" id="preview_mapping"><?php esc_html_e('Preview First Row', 'fs-bulk-page-generator'); ?></button>
+          <div id="preview_content" style="margin-top: 20px;"></div>
+          <button class="button button-primary" id="generate_pages" style="margin-top: 20px;"><?php esc_html_e('Generate All Pages', 'fs-bulk-page-generator'); ?></button>
+          <div id="progress_area" style="display: none; margin-top: 20px;">
+            <h3><?php esc_html_e('Generation Progress', 'fs-bulk-page-generator'); ?></h3>
+            <div class="progress-bar-wrapper" style="border: 1px solid #ccc; padding: 1px;">
+              <div class="progress-bar" style="background-color: #0073aa; height: 20px; width: 0%;"></div>
+            </div>
+            <div id="progress_text"></div>
+          </div>
+        </div>
+
+      </div>
+  <?php
   }
 
   public function get_template_placeholders()
@@ -312,13 +341,22 @@ class FSBulkPageGenerator
 
           // Debug: Check the actual slug after insertion
           if (!is_wp_error($post_id)) {
+            // Get Yoast import settings from the request
+            $import_meta_title = isset($_POST['yoast_settings']['import_meta_title'])
+              ? $_POST['yoast_settings']['import_meta_title'] === 'yes'
+              : false;
 
-            // Add meta title
-            if (isset($row['meta_title']) && !empty($row['meta_title'])) {
+            $import_meta_desc = isset($_POST['yoast_settings']['import_meta_desc'])
+              ? $_POST['yoast_settings']['import_meta_desc'] === 'yes'
+              : false;
+
+            // Only import meta title if enabled and exists in CSV
+            if ($import_meta_title && isset($row['meta_title']) && !empty($row['meta_title'])) {
               update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($row['meta_title']));
             }
-            // Add meta description
-            if (isset($row['meta_description']) && !empty($row['meta_description'])) {
+
+            // Only import meta description if enabled and exists in CSV
+            if ($import_meta_desc && isset($row['meta_description']) && !empty($row['meta_description'])) {
               update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_text_field($row['meta_description']));
             }
 
