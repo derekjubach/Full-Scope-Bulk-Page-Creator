@@ -14,7 +14,7 @@ jQuery(document).ready(function ($) {
 			url: fsBulkPageGenerator.ajax_url,
 			type: 'POST',
 			data: {
-				action: 'get_template_placeholders',
+				action: 'fs_bulk_page_generator_get_placeholders',
 				nonce: fsBulkPageGenerator.nonce,
 				template_id: templateId,
 			},
@@ -148,7 +148,7 @@ jQuery(document).ready(function ($) {
 			url: fsBulkPageGenerator.ajax_url,
 			type: 'POST',
 			data: {
-				action: 'preview_mapping',
+				action: 'fs_bulk_page_generator_preview_mapping',
 				nonce: fsBulkPageGenerator.nonce,
 				template_id: $('#template_page').val(),
 				mapping: mapping,
@@ -214,7 +214,7 @@ jQuery(document).ready(function ($) {
 				url: fsBulkPageGenerator.ajax_url,
 				type: 'POST',
 				data: {
-					action: 'process_csv',
+					action: 'fs_bulk_page_generator_process_csv',
 					nonce: fsBulkPageGenerator.nonce,
 					template_id: $('#template_page').val(),
 					mapping: mapping,

@@ -15,19 +15,20 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-class FSBulkPageGenerator
+class FullScope_Bulk_Page_Generator
 {
   private $plugin_path;
   private $placeholder_pattern = '/\{\{([^}]+)\}\}/';
+  private const TEXT_DOMAIN = 'fs-bulk-page-generator';
 
   public function __construct()
   {
     $this->plugin_path = plugin_dir_path(__FILE__);
     add_action('admin_menu', array($this, 'add_admin_menu'));
     add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-    add_action('wp_ajax_process_csv', array($this, 'process_csv'));
-    add_action('wp_ajax_get_template_placeholders', array($this, 'get_template_placeholders'));
-    add_action('wp_ajax_preview_mapping', array($this, 'preview_mapping'));
+    add_action('wp_ajax_fs_bulk_page_generator_process_csv', array($this, 'process_csv'));
+    add_action('wp_ajax_fs_bulk_page_generator_get_placeholders', array($this, 'get_template_placeholders'));
+    add_action('wp_ajax_fs_bulk_page_generator_preview_mapping', array($this, 'preview_mapping'));
   }
 
   public function add_admin_menu()
@@ -52,71 +53,227 @@ class FSBulkPageGenerator
     ));
 ?>
     <style>
-      #preview_section img {
+      .fs-bulk-page-generator #preview_section img {
         max-width: 100%;
       }
 
-      .page-content-preview {
+      .fs-bulk-page-generator .card {
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .fs-bulk-page-generator .card.inner {
+        border-color: #afbbdf;
+        margin-top: 0;
+      }
+
+      .fs-bulk-page-generator h2 {
+        margin-top: 0;
+        color: #1d2327;
+        font-size: 1.3em;
+        margin-bottom: 1em;
+      }
+
+      .fs-bulk-page-generator h4 {
+        margin-top: 0;
+        color: #1d2327;
+        font-size: 1.1em;
+        margin-bottom: 1em;
+      }
+
+      .fs-bulk-page-generator p {
+        color: #50575e;
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 1em 0;
+      }
+
+      .fs-bulk-page-generator .small {
+        font-size: 13px;
+        font-style: italic;
+        color: #646970;
+      }
+
+      .fs-bulk-page-generator ul {
+        list-style: disc;
+        margin-left: 20px;
+        color: #50575e;
+      }
+
+      .fs-bulk-page-generator li {
+        margin-bottom: 5px;
+      }
+
+      .fs-bulk-page-generator #yoast_settings ul {
+        display: flex;
+      }
+
+      .fs-bulk-page-generator #yoast_settings li {
+        margin-right: 15px;
+      }
+
+      .fs-bulk-page-generator select {
+        max-width: 300px;
+        width: 100%;
+      }
+
+      .fs-bulk-page-generator .mapping-field {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .fs-bulk-page-generator .mapping-field label {
+        min-width: 200px;
+        font-weight: 500;
+      }
+
+      .fs-bulk-page-generator .radio-group {
+        margin: 10px 0;
+      }
+
+      .fs-bulk-page-generator .radio-group label {
+        margin-right: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .fs-bulk-page-generator #progress_area {
+        background: #fff;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+      }
+
+      .fs-bulk-page-generator .progress-bar-wrapper {
+        margin: 10px 0;
+        background: #f0f0f1;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .fs-bulk-page-generator .progress-bar {
+        background: #2271b1;
+        height: 20px;
+        transition: width 0.3s ease;
+      }
+
+      .fs-bulk-page-generator #progress_text {
+        text-align: center;
+        color: #50575e;
+        font-size: 13px;
+      }
+
+      .fs-bulk-page-generator .page-content-preview {
         margin-bottom: 20px;
         padding: 15px;
         background: #fff;
         border: 1px solid #ddd;
       }
 
-      .page-content-preview h4 {
+      .fs-bulk-page-generator .page-content-preview h4 {
         margin-top: 0;
         padding-bottom: 10px;
         border-bottom: 1px solid #eee;
       }
 
-      .yoast-preview-section {
+      .fs-bulk-page-generator .yoast-preview-section {
         background: #f7f7f7;
         border: 1px solid #ddd;
         padding: 15px;
         margin-top: 20px;
       }
 
-      .yoast-preview-section h4 {
+      .fs-bulk-page-generator .yoast-preview-section h4 {
         margin-top: 0;
         color: #006d9c;
         padding-bottom: 10px;
         border-bottom: 1px solid #ddd;
       }
 
-      .yoast-meta-field {
+      .fs-bulk-page-generator .yoast-meta-field {
         margin: 10px 0;
         padding: 5px;
         background: #fff;
         border: 1px solid #eee;
       }
 
-      .yoast-meta-field strong {
+      .fs-bulk-page-generator .yoast-meta-field strong {
         color: #666;
+      }
+
+      /* Button styling */
+      .fs-bulk-page-generator .button {
+        margin: 15px 5px 5px 0;
+      }
+
+      .fs-bulk-page-generator .button:first-child {
+        margin-left: 0;
+      }
+
+      /* Custom button styling */
+      .fs-bulk-page-generator .button-secondary {
+        background: #f0f0f1;
+        border-color: #0073aa;
+        color: #0073aa;
+      }
+
+      .fs-bulk-page-generator .button-secondary:hover,
+      .fs-bulk-page-generator .button-secondary:focus {
+        background: #f7f7f7;
+        border-color: #006799;
+        color: #006799;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+      }
+
+      .fs-bulk-page-generator .button-secondary:active {
+        background: #f0f0f1;
+        border-color: #006799;
+        box-shadow: inset 0 2px 5px -3px rgba(0, 0, 0, .5);
+        transform: translateY(1px);
+      }
+
+      /* Adjust spacing for all buttons */
+      .fs-bulk-page-generator .button {
+        margin: 15px 5px 5px 0;
+        min-height: 32px;
+        line-height: 2;
+        padding: 0 12px;
+      }
+
+      .fs-bulk-page-generator .button:first-child {
+        margin-left: 0;
       }
     </style>
     <div class="wrap fs-bulk-page-generator">
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
 
       <div class="card">
-        <h2><?php esc_html_e('Step 1: Select Template Page', 'fs-bulk-page-generator'); ?></h2>
-        <p><?php esc_html_e('Choose an existing page to use as your template. The page should include placeholders in the format {{placeholder_name}}.', 'fs-bulk-page-generator'); ?></p>
-        <select id="template_page" style="width: 300px;">
-          <option value=""><?php esc_html_e('Select a page...', 'fs-bulk-page-generator'); ?></option>
-          <?php foreach ($pages as $page): ?>
-            <option value="<?php echo esc_attr($page->ID); ?>">
-              <?php echo esc_html($page->post_title); ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-        <button class="button button-secondary" id="scan_placeholders"><?php esc_html_e('Scan for Placeholders', 'fs-bulk-page-generator'); ?></button>
+        <div class="card inner">
+          <h2><?php esc_html_e('Step 1: Select Template Page', 'fs-bulk-page-generator'); ?></h2>
+          <p><?php esc_html_e('Choose an existing page to use as your template. The page should include placeholders in the format {{placeholder_name}}.', 'fs-bulk-page-generator'); ?></p>
+          <select id="template_page" style="width: 300px;">
+            <option value=""><?php esc_html_e('Select a page...', 'fs-bulk-page-generator'); ?></option>
+            <?php foreach ($pages as $page): ?>
+              <option value="<?php echo esc_attr($page->ID); ?>">
+                <?php echo esc_html($page->post_title); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+          <button class="button button-secondary" id="scan_placeholders"><?php esc_html_e('Scan for Placeholders', 'fs-bulk-page-generator'); ?></button>
+        </div>
       </div>
 
       <div class="card" style="margin-top: 20px; display: none;" id="mapping_section">
-        <h2><?php esc_html_e('Step 2: Map CSV Columns to Placeholders', 'fs-bulk-page-generator'); ?></h2>
-        <p><?php esc_html_e('Upload your CSV file and map the columns to the placeholders found in the template.', 'fs-bulk-page-generator'); ?></p>
-        <input type="file" id="csv_file" accept=".csv" />
-        <div id="mapping_fields" style="margin-top: 20px;">
-          <!-- Mapping fields will be populated here -->
+        <div class="card inner" style="overflow: hidden;">
+          <h2><?php esc_html_e('Step 2: Map CSV Columns to Placeholders', 'fs-bulk-page-generator'); ?></h2>
+          <p><?php esc_html_e('Upload your CSV file and map the columns to the placeholders found in the template.', 'fs-bulk-page-generator'); ?></p>
+          <input type="file" id="csv_file" accept=".csv" />
+          <div id="mapping_fields" style="margin-top: 20px;">
+            <!-- Mapping fields will be populated here -->
+          </div>
         </div>
 
         <div id="parent_page_section" style="margin-top: 20px;">
@@ -148,23 +305,27 @@ class FSBulkPageGenerator
               <li>meta_title</li>
               <li>meta_description</li>
             </ul>
-            <div style="margin-bottom: 15px;">
+            <div class="radio-group">
               <p><?php esc_html_e('Import Meta Titles from CSV?', 'fs-bulk-page-generator'); ?></p>
-              <label style="margin-right: 15px;">
-                <input type="radio" name="import_meta_title" value="yes"> Yes
+              <label>
+                <input type="radio" name="import_meta_title" value="yes">
+                <?php esc_html_e('Yes', 'fs-bulk-page-generator'); ?>
               </label>
               <label>
-                <input type="radio" name="import_meta_title" value="no" checked> No
+                <input type="radio" name="import_meta_title" value="no" checked>
+                <?php esc_html_e('No', 'fs-bulk-page-generator'); ?>
               </label>
             </div>
 
-            <div>
+            <div class="radio-group">
               <p><?php esc_html_e('Import Meta Descriptions from CSV?', 'fs-bulk-page-generator'); ?></p>
-              <label style="margin-right: 15px;">
-                <input type="radio" name="import_meta_desc" value="yes"> Yes
+              <label>
+                <input type="radio" name="import_meta_desc" value="yes">
+                <?php esc_html_e('Yes', 'fs-bulk-page-generator'); ?>
               </label>
               <label>
-                <input type="radio" name="import_meta_desc" value="no" checked> No
+                <input type="radio" name="import_meta_desc" value="no" checked>
+                <?php esc_html_e('No', 'fs-bulk-page-generator'); ?>
               </label>
             </div>
           </div>
@@ -470,10 +631,16 @@ class FSBulkPageGenerator
 
     wp_localize_script('fs-bulk-page-generator', 'fsBulkPageGenerator', array(
       'ajax_url' => admin_url('admin-ajax.php'),
-      'nonce' => wp_create_nonce('fs_bulk_page_generator_nonce')
+      'nonce' => wp_create_nonce('fs_bulk_page_generator_nonce'),
+      'strings' => array(
+        'confirmGenerate' => __('Are you sure you want to generate pages for all CSV rows?', self::TEXT_DOMAIN),
+        'selectTemplate' => __('Please select a template page first', self::TEXT_DOMAIN),
+        'uploadCsv' => __('Please upload a CSV file first', self::TEXT_DOMAIN),
+        'complete' => __('All pages have been generated!', self::TEXT_DOMAIN),
+      )
     ));
   }
 }
 
 // Initialize the plugin
-new FSBulkPageGenerator();
+new FullScope_Bulk_Page_Generator();
