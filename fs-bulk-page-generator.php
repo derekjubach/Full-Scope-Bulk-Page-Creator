@@ -486,7 +486,7 @@ class FullScope_Bulk_Page_Generator
       // Sanitize mapping
       $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
 
-      // Note: wp_kses_post is used instead of sanitize_text_field here to preserve necessary HTML formatting in the CSV data that will be used for page content. sanitize_text_field would strip HTML tags and break content formatting.
+      // Note: wp_kses_post is used instead of sanitize_text_field here to preserve necessary HTML formatting in the CSV data that will be used for page content. Sanitize_text_field would strip HTML tags and break content formatting.
       $csv_data = isset($_POST['csv_data']) ?
         array_map(
           function ($row) {
