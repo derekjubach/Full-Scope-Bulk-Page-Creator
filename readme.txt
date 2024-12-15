@@ -19,7 +19,7 @@ Location Pages Generator allows you to quickly create multiple WordPress pages u
 * Use any existing WordPress page as a template
 * Import data from CSV files
 * Support for custom URL structures through parent pages
-* Yoast SEO meta description integration
+* Yoast SEO meta description and title integration
 * Preview before generation
 * Batch processing for large datasets
 * Progress tracking during page creation
@@ -35,14 +35,15 @@ Location Pages Generator allows you to quickly create multiple WordPress pages u
 Your CSV file should include columns for:
 * All placeholders used in your template
 * URL slug (optional)
-* meta_description (optional, for Yoast SEO)
+* meta_description and/or meta_title (optional, for Yoast SEO)
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/location-pages-generator` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Location Generator in the admin menu
-4. Follow the step-by-step process to generate your pages
+1. Search for "FullScope Bulk Page Generator" in the Plugins section
+2. Click "Install Now"  
+3. Activate the plugin through the 'Plugins' menu in WordPress
+4. Go to FullScope Bulk Page Generator in the admin menu
+5. Follow the step-by-step process to generate your pages
 
 == Frequently Asked Questions ==
 
@@ -68,6 +69,7 @@ define( 'WP_DEBUG_LOG', true );
 define( 'WP_DEBUG_DISPLAY', false ); // Prevents errors from displaying on screen
 
 Logs will be written to wp-content/debug.log
+Remove these lines when you are done debugging.
 
 == Screenshots ==
 
