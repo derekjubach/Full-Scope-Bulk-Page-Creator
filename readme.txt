@@ -1,7 +1,7 @@
 === FullScope Bulk Page Generator ===
-Contributors: derekjubach, FullScope
-Author: FullScope
-Tags: pages, generator, csv, import, bulk pages, location pages
+Contributors: derekjubach, fullscope
+Author: Derek Jubach
+Tags: pages, generator, csv, import, bulk pages
 Requires at least: 5.0
 Tested up to: 6.7
 Stable tag: 1.0
@@ -79,8 +79,3 @@ Logs will be written to wp-content/debug.log
 
 = 1.0 =
 * Initial release
-
-== Upgrade Notice ==
-
-= 1.0 =
-Initial release of Location Pages Generator.
