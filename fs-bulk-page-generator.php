@@ -475,13 +475,25 @@ class FullScope_Bulk_Page_Generator
         return;
       }
 
-      // Add error checking for required parameters
-      if (!isset($_POST['template_id']) || !isset($_POST['mapping']) || !isset($_POST['csv_data']) || !isset($_POST['slug_settings'])) {
-        wp_send_json_error('Missing required parameters: ' . print_r($_POST, true));
+      // Check required parameters
+      $required_params = ['template_id', 'mapping', 'csv_data', 'slug_settings'];
+      $missing_params = array();
+
+      foreach ($required_params as $param) {
+        if (!isset($_POST[$param])) {
+          $missing_params[] = $param;
+        }
+      }
+
+      if (!empty($missing_params)) {
+        wp_send_json_error(array(
+          'message' => 'Missing required parameters',
+          'missing' => $missing_params
+        ));
         return;
       }
 
-      $template_id = intval($_POST['template_id']);
+      $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
 
       // Sanitize mapping
       $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
@@ -498,10 +510,9 @@ class FullScope_Bulk_Page_Generator
 
       $slug_settings = isset($_POST['slug_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['slug_settings'])) : array();
 
-      // Log the data
-      $this->fs_bulk_page_generator_log('Mapping: ' . print_r($mapping, true));
-      $this->fs_bulk_page_generator_log('CSV data: ' . print_r($csv_data, true));
-      $this->fs_bulk_page_generator_log('Slug settings: ' . print_r($slug_settings, true));
+      $this->fs_bulk_page_generator_log(['data' => $mapping], 'Mapping');
+      $this->fs_bulk_page_generator_log(['data' => $csv_data], 'CSV Data');
+      $this->fs_bulk_page_generator_log(['data' => $slug_settings], 'Slug Settings');
 
       // Validate data
       if (empty($mapping) || empty($csv_data) || empty($slug_settings)) {
@@ -571,7 +582,10 @@ class FullScope_Bulk_Page_Generator
           );
 
           // Log the post data before insertion
-          $this->fs_bulk_page_generator_log('Attempting to insert post with data: ' . print_r($post_data, true));
+          $this->fs_bulk_page_generator_log(
+            ['attempting_insert' => $post_data],
+            'Post Insert'
+          );
 
           $post_id = wp_insert_post($post_data, true);
 
@@ -651,16 +665,16 @@ class FullScope_Bulk_Page_Generator
   // Log messages to the error log
   public function fs_bulk_page_generator_log($message, $type = 'debug')
   {
-    if (! defined('WP_DEBUG') || ! WP_DEBUG) {
+    if (!defined('WP_DEBUG') || !WP_DEBUG) {
       return;
     }
 
     $plugin_name = 'FS Bulk Page Generator';
     $datetime    = gmdate('Y-m-d H:i:s');
 
-    // Ensure message is string and handle objects/arrays
-    if (! is_string($message)) {
-      $message = print_r($message, true);
+    // Handle non-string messages
+    if (!is_string($message)) {
+      $message = wp_json_encode($message, JSON_PRETTY_PRINT);
     }
 
     $log_message = sprintf(
