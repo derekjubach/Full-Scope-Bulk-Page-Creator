@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
+// Main plugin class
 class FullScope_Bulk_Page_Generator
 {
   private $plugin_path;
@@ -31,6 +32,7 @@ class FullScope_Bulk_Page_Generator
     add_action('wp_ajax_fs_bulk_page_generator_preview_mapping', array($this, 'preview_mapping'));
   }
 
+  // Add admin menu
   public function add_admin_menu()
   {
     add_menu_page(
@@ -52,6 +54,7 @@ class FullScope_Bulk_Page_Generator
       'sort_order' => 'ASC'
     ));
 ?>
+    <!-- CSS for the plugin -->
     <style>
       .fs-bulk-page-generator #preview_section img {
         max-width: 100%;
@@ -213,7 +216,6 @@ class FullScope_Bulk_Page_Generator
         margin-left: 0;
       }
 
-      /* Custom button styling */
       .fs-bulk-page-generator .button-secondary {
         background: #f0f0f1;
         border-color: #0073aa;
@@ -235,7 +237,6 @@ class FullScope_Bulk_Page_Generator
         transform: translateY(1px);
       }
 
-      /* Adjust spacing for all buttons */
       .fs-bulk-page-generator .button {
         margin: 15px 5px 5px 0;
         min-height: 32px;
@@ -277,6 +278,7 @@ class FullScope_Bulk_Page_Generator
         </div>
 
         <div id="parent_page_section" style="margin-top: 20px;">
+
           <div class="card">
             <h4><?php esc_html_e('Parent Page Settings', 'fs-bulk-page-generator'); ?></h4>
             <p><?php esc_html_e('Select a parent page for all generated location pages:', 'fs-bulk-page-generator'); ?></p>
@@ -297,6 +299,7 @@ class FullScope_Bulk_Page_Generator
               <!-- Options will be populated from CSV headers -->
             </select>
           </div>
+
           <div id="yoast_settings" class="card" style="margin-top: 20px;">
             <h4><?php esc_html_e('Yoast SEO Settings', 'fs-bulk-page-generator'); ?></h4>
             <p><?php esc_html_e('Import Meta Titles and Descriptions from CSV into Yoast SEO? You do not need placeholders for this.', 'fs-bulk-page-generator'); ?></p>
@@ -316,7 +319,6 @@ class FullScope_Bulk_Page_Generator
                 <?php esc_html_e('No', 'fs-bulk-page-generator'); ?>
               </label>
             </div>
-
             <div class="radio-group">
               <p><?php esc_html_e('Import Meta Descriptions from CSV?', 'fs-bulk-page-generator'); ?></p>
               <label>
@@ -329,6 +331,7 @@ class FullScope_Bulk_Page_Generator
               </label>
             </div>
           </div>
+
         </div>
 
         <div class="card" style="margin-top: 20px; display: none" id="preview_section">
@@ -349,6 +352,7 @@ class FullScope_Bulk_Page_Generator
   <?php
   }
 
+  // Get placeholders from the template page
   public function get_template_placeholders()
   {
     check_ajax_referer('fs_bulk_page_generator_nonce', 'nonce');
@@ -405,6 +409,7 @@ class FullScope_Bulk_Page_Generator
     wp_send_json_success($debug_info);
   }
 
+  // Preview the mapping of CSV rows to the template page
   public function preview_mapping()
   {
     check_ajax_referer('fs_bulk_page_generator_nonce', 'nonce');
@@ -464,6 +469,7 @@ class FullScope_Bulk_Page_Generator
     ));
   }
 
+  // Process the CSV data and generate pages
   public function process_csv()
   {
 
