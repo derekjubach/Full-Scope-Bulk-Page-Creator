@@ -54,200 +54,6 @@ class FullScope_Bulk_Page_Generator
       'sort_order' => 'ASC'
     ));
 ?>
-    <!-- CSS for the plugin -->
-    <style>
-      .fs-bulk-page-generator #preview_section img {
-        max-width: 100%;
-      }
-
-      .fs-bulk-page-generator .card {
-        padding: 20px;
-        margin-top: 20px;
-      }
-
-      .fs-bulk-page-generator .card.inner {
-        border-color: #afbbdf;
-        margin-top: 0;
-      }
-
-      .fs-bulk-page-generator h2 {
-        margin-top: 0;
-        color: #1d2327;
-        font-size: 1.3em;
-        margin-bottom: 1em;
-      }
-
-      .fs-bulk-page-generator h4 {
-        margin-top: 0;
-        color: #1d2327;
-        font-size: 1.1em;
-        margin-bottom: 1em;
-      }
-
-      .fs-bulk-page-generator p {
-        color: #50575e;
-        font-size: 13px;
-        line-height: 1.5;
-        margin: 1em 0;
-      }
-
-      .fs-bulk-page-generator .small {
-        font-size: 13px;
-        font-style: italic;
-        color: #646970;
-      }
-
-      .fs-bulk-page-generator ul {
-        list-style: disc;
-        margin-left: 20px;
-        color: #50575e;
-      }
-
-      .fs-bulk-page-generator li {
-        margin-bottom: 5px;
-      }
-
-      .fs-bulk-page-generator #yoast_settings ul {
-        display: flex;
-      }
-
-      .fs-bulk-page-generator #yoast_settings li {
-        margin-right: 15px;
-      }
-
-      .fs-bulk-page-generator select {
-        max-width: 300px;
-        width: 100%;
-      }
-
-      .fs-bulk-page-generator .mapping-field {
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .fs-bulk-page-generator .mapping-field label {
-        min-width: 200px;
-        font-weight: 500;
-      }
-
-      .fs-bulk-page-generator .radio-group {
-        margin: 10px 0;
-      }
-
-      .fs-bulk-page-generator .radio-group label {
-        margin-right: 15px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-      }
-
-      .fs-bulk-page-generator #progress_area {
-        background: #fff;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-      }
-
-      .fs-bulk-page-generator .progress-bar-wrapper {
-        margin: 10px 0;
-        background: #f0f0f1;
-        border-radius: 3px;
-        overflow: hidden;
-      }
-
-      .fs-bulk-page-generator .progress-bar {
-        background: #2271b1;
-        height: 20px;
-        transition: width 0.3s ease;
-      }
-
-      .fs-bulk-page-generator #progress_text {
-        text-align: center;
-        color: #50575e;
-        font-size: 13px;
-      }
-
-      .fs-bulk-page-generator .page-content-preview {
-        margin-bottom: 20px;
-        padding: 15px;
-        background: #fff;
-        border: 1px solid #ddd;
-      }
-
-      .fs-bulk-page-generator .page-content-preview h4 {
-        margin-top: 0;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-      }
-
-      .fs-bulk-page-generator .yoast-preview-section {
-        background: #f7f7f7;
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-top: 20px;
-      }
-
-      .fs-bulk-page-generator .yoast-preview-section h4 {
-        margin-top: 0;
-        color: #006d9c;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .fs-bulk-page-generator .yoast-meta-field {
-        margin: 10px 0;
-        padding: 5px;
-        background: #fff;
-        border: 1px solid #eee;
-      }
-
-      .fs-bulk-page-generator .yoast-meta-field strong {
-        color: #666;
-      }
-
-      /* Button styling */
-      .fs-bulk-page-generator .button {
-        margin: 15px 5px 5px 0;
-      }
-
-      .fs-bulk-page-generator .button:first-child {
-        margin-left: 0;
-      }
-
-      .fs-bulk-page-generator .button-secondary {
-        background: #f0f0f1;
-        border-color: #0073aa;
-        color: #0073aa;
-      }
-
-      .fs-bulk-page-generator .button-secondary:hover,
-      .fs-bulk-page-generator .button-secondary:focus {
-        background: #f7f7f7;
-        border-color: #006799;
-        color: #006799;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-      }
-
-      .fs-bulk-page-generator .button-secondary:active {
-        background: #f0f0f1;
-        border-color: #006799;
-        box-shadow: inset 0 2px 5px -3px rgba(0, 0, 0, .5);
-        transform: translateY(1px);
-      }
-
-      .fs-bulk-page-generator .button {
-        margin: 15px 5px 5px 0;
-        min-height: 32px;
-        line-height: 2;
-        padding: 0 12px;
-      }
-
-      .fs-bulk-page-generator .button:first-child {
-        margin-left: 0;
-      }
-    </style>
     <div class="wrap fs-bulk-page-generator">
       <h1><?php esc_html_e('Bulk Page Generator', 'fs-bulk-page-generator'); ?></h1>
 
@@ -501,7 +307,6 @@ class FullScope_Bulk_Page_Generator
 
       $template_id = isset($_POST['template_id']) ? intval($_POST['template_id']) : 0;
 
-      // Sanitize mapping
       $mapping = isset($_POST['mapping']) ? array_map('sanitize_text_field', wp_unslash($_POST['mapping'])) : array();
 
       // Note: wp_kses_post is used instead of sanitize_text_field here to preserve necessary HTML formatting in the CSV data that will be used for page content. Sanitize_text_field would strip HTML tags and break content formatting.
@@ -648,9 +453,18 @@ class FullScope_Bulk_Page_Generator
       return;
     }
 
+    // Enqueue styles
+    wp_enqueue_style(
+      'fs-bulk-page-generator-styles',
+      plugins_url('fs-bpg-styles.css', __FILE__),
+      array(),
+      '1.0'
+    );
+
+    // Enqueue scripts
     wp_enqueue_script(
       'fs-bulk-page-generator',
-      plugins_url('admin.js', __FILE__),
+      plugins_url('fs-bpg-scripts.js', __FILE__),
       array('jquery'),
       '1.0',
       true
