@@ -73,9 +73,13 @@ Remove these lines when you are done debugging.
 
 == Screenshots ==
 
-1. Main interface showing template selection
+1. Select the page/post/template with the placeholders
 2. CSV mapping interface
-3. Preview and generation screen
+3. Additional settings
+4. Preview first row
+5. Generation confirmation
+6. New pages nested under parent
+7. New page frontend
 
 == Changelog ==
 
