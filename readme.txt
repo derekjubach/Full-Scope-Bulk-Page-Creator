@@ -13,14 +13,14 @@ Generate multiple WordPress pages from a CSV file using an existing page as a te
 
 == Description ==
 
-Location Pages Generator allows you to quickly create multiple WordPress pages using an existing page as a template. Perfect for creating location pages, product pages, or any other content that follows a consistent structure.
+The FullScope Bulk Page Generator allows you to quickly create multiple WordPress pages using an existing page as a template. Perfect for creating location pages, product pages, or any other content that follows a consistent structure.
 
 = Features =
 * Use any existing WordPress page as a template
 * Import data from CSV files
 * Support for custom URL structures through parent pages
 * Yoast SEO meta description and title integration
-* Preview before generation
+* Preview first row before generation
 * Batch processing for large datasets
 * Progress tracking during page creation
 
@@ -29,12 +29,13 @@ Location Pages Generator allows you to quickly create multiple WordPress pages u
 2. Prepare your CSV file with columns matching your placeholders
 3. Select your template page and map CSV columns to placeholders
 4. Choose a parent page (optional)
+5. Include Yoast meta_description and meta_title (optional)
 5. Generate all pages automatically
 
 = CSV Requirements =
 Your CSV file should include columns for:
 * All placeholders used in your template
-* URL slug (optional)
+* URL slug
 * meta_description and/or meta_title (optional, for Yoast SEO)
 
 == Installation ==
