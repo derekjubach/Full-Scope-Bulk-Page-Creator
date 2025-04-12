@@ -3,7 +3,7 @@ Contributors: djubach, fullscope
 Author: Derek Jubach
 Tags: pages, generator, csv, import, bulk pages
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 1.0
 Requires PHP: 7.2
 License: GPLv2 or later
@@ -83,6 +83,9 @@ Remove these lines when you are done debugging.
 7. New page frontend
 
 == Changelog ==
+
+= 1.0.1 =
+* WordPress 6.8 Compatibility
 
 = 1.0 =
 * Initial release
