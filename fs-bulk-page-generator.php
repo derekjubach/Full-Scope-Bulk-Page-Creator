@@ -3,7 +3,7 @@
 /**
  * Plugin Name: FullScope Bulk Page Generator
  * Description: Bulk Generate pages from a CSV file 
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Derek Jubach
  * Author URI:  https://github.com/derekjubach/Full-Scope-Bulk-Page-Creator
  * License:     GPLv2 or later
